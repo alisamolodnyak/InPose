@@ -15,7 +15,9 @@ class Color(QtWidgets.QWidget):
         self.setPalette(palette)
 class Gallery(QtWidgets.QMainWindow):
     def __init__(self, chosen_images, parent=None):
+        self.parent = parent
         self.number_of_images = 0
+        self.chosen_image = None
         super(Gallery, self).__init__(parent)
         highlight_dir = os.path.join("all")
         uic.loadUi('gallery.ui', self)
@@ -23,14 +25,10 @@ class Gallery(QtWidgets.QMainWindow):
         self.gallery_column_layouts = [QtWidgets.QVBoxLayout(), QtWidgets.QVBoxLayout()]
 
         for i in self.gallery_column_layouts:
-            columns_layout.addLayout(i)
-        # self.gallery_column_layouts[0].addWidget(Color('red'))
-        # self.gallery_column_layouts[1].addWidget(Color('yellow'))
-        # self.gallery_column_layouts[0].addWidget(Color('purple'))
-        # self.gallery_column_layouts[0].addWidget(Color('red'))
-        # self.gallery_column_layouts[1].addWidget(Color('yellow'))
-        # self.gallery_column_layouts[0].addWidget(Color('purple'))
+            i.setContentsMargins(0, 0, 0, 0)
 
+        for i in self.gallery_column_layouts:
+            columns_layout.addLayout(i)
 
 
         #self.scrollArea = QtWidgets.QScrollArea(widgetResizable=True)
@@ -52,11 +50,22 @@ class Gallery(QtWidgets.QMainWindow):
             pixmap = QtGui.QPixmap(file)
             pixmap = pixmap.scaledToWidth(200)
             label = QtWidgets.QLabel()
+            label.mousePressEvent = self.get_clicked_function(file.split("\\")[-1])
             label.setPixmap(pixmap)
             self.gallery_column_layouts[self.number_of_images % len(self.gallery_column_layouts)].addWidget(label)
             self.number_of_images += 1
         except StopIteration:
             self._timer.stop()
+
+    def get_clicked_function(self, filename):
+        def foo(*args):
+            print(filename)
+            self.chosen_image = filename
+            if self.parent:
+                print(self.parent)
+                self.parent.set_contour(self.chosen_image)
+            self.hide()
+        return foo
 
     def add_pixmap(self, pixmap):
         if not pixmap.isNull():

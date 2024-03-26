@@ -17,6 +17,7 @@ class Camera(QObject):
         self.cammode = self.cam.CaptureMode(0)
         self.camimgcap = QCameraImageCapture(self.cam)
 
+
     def iniCamera(self):
         print(self.caminfo.description())
         print(self.caminfo.availableCameras())
